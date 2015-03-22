@@ -4,7 +4,14 @@ require File.expand_path('../../lib/galago/rate_limiter.rb', __FILE__)
 module Galago
   class RateLimiterTest < Minitest::Unit::TestCase
     def setup
-      RateLimiter::Counter.instance.reset!
+      RateLimiter.configure do |config|
+        config.counter = Dalli::Client.new('localhost:11211', {
+          namespace: 'galago-rate_limiter',
+          compress: true
+        })
+        config.counter.reset!
+      end
+
       @app = lambda { |env| [200, {}, ["Hello There"]] }
       @rate_limiter = RateLimiter.new(@app)
       @rate_limiter_limit = RateLimiter::Configuration.instance.limit

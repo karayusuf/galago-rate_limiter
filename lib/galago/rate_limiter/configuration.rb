@@ -8,13 +8,11 @@ module Galago
       DEFAULT_LIMIT = 5_000
       DEFAULT_API_KEY_HEADER = 'HTTP_X_API_KEY'.freeze
 
-      attr_reader :api_key_header, :limit
-      attr_accessor :counter
+      attr_reader :api_key_header, :limit, :counter
 
       def initialize
         @limit = DEFAULT_LIMIT
         @api_key_header = DEFAULT_API_KEY_HEADER
-        @counter = Counter.instance
       end
 
       def limit=(limit)
@@ -28,6 +26,13 @@ module Galago
         header.upcase!
 
         @api_key_header = "HTTP_#{header}".freeze
+      end
+
+      def counter=(counter)
+        @counter = case counter
+                   when Dalli::Client then MemcachedCounter.new(counter)
+                   else counter
+                   end
       end
 
       def reset!

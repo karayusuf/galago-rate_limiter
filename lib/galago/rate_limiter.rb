@@ -1,7 +1,7 @@
 require "json"
 require "dalli"
 require_relative "./rate_limiter/configuration"
-require_relative "./rate_limiter/counter"
+require_relative "./rate_limiter/memcached_counter"
 require_relative "./rate_limiter/railtie" if defined?(Rails)
 
 module Galago
@@ -16,8 +16,8 @@ module Galago
 
     def initialize(app)
       @app = app
-      @counter = Configuration.instance.counter
       @config = Configuration.instance
+      @counter = @config.counter
     end
 
     def call(env)
