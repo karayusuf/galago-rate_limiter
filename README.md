@@ -19,6 +19,12 @@ Or install it yourself as:
     $ gem install galago-rate_limiter
 
 ## Configuration
+
+| Name | Description | Default |
+| ---- | ----------- | ------- |
+| limit | Number of requests allow per hour | 5,000 |
+| api_key_header | Header containing the consumers api key | 'X-Api-Key' |
+
 ## Usage
 
 ### Rails
