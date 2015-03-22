@@ -14,9 +14,11 @@ module Galago
       end
 
       def api_key_header=(api_key_header)
-        api_key_header.gsub!('-', '_')
-        api_key_header.upcase!
-        @api_key_header = "HTTP_#{api_key_header}"
+        header = api_key_header.dup
+        header.gsub!('-', '_')
+        header.upcase!
+
+        @api_key_header = "HTTP_#{api_key_header}".freeze
       end
 
     end
