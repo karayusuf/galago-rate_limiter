@@ -1,11 +1,11 @@
 # coding: utf-8
 Gem::Specification.new do |spec|
   spec.name          = "galago-rate_limiter"
-  spec.version       = "0.0.1"
+  spec.version       = "0.0.2"
   spec.authors       = ["Joe Karayusuf"]
   spec.email         = ["jkarayusuf@gmail.com"]
   spec.summary       = %q{GitHub style API Rate limiter}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/karayusuf/galago-rate_limiter"
   spec.license       = "MIT"
 
   spec.files         = Dir['lib/**/*.rb']
