@@ -58,6 +58,7 @@ end
 
 ### Rack
 ```ruby
+# config.ru
 require 'galago/rate_limiter'
 
 Galago::RateLimiter.configure do |config|
