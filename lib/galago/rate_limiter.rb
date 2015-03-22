@@ -27,10 +27,10 @@ module Galago
         status = 403
         headers = {
           X_LIMIT_HEADER => @config.limit.to_s,
-          X_REMAINING_HEADER => 0,
+          X_REMAINING_HEADER => "0",
           X_RESET_HEADER => limit_resets_at.to_s
         }
-        body = JSON(message: "API rate limit exceeded for #{api_key}")
+        body = [JSON(message: "API rate limit exceeded for #{api_key}")]
       else
         status, headers, body = @app.call(env)
         headers[X_LIMIT_HEADER] = @config.limit.to_s
