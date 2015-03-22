@@ -1,6 +1,29 @@
 # Galago::RateLimiter
 
-TODO: Write a gem description
+Galago::RateLimiter is middleware that provides github style rate limiting to
+any Rack application. It has built in support for Rails and can be used by
+simply adding it to your gemfile.
+
+The middleware will add the following HTTP headers to any API request:
+
+| Header Name | Description |
+| ----------- | ----------- |
+| X-RateLimit-Limit | The maximum number of requests that the consumer is permitted to make per hour. |
+| X-RateLimit-Remaining | The number of requests remaining in the current rate limit window. |
+| X-RateLimit-Reset | The time at which the current rate limit window resets in UTC epoch seconds. |
+
+Example:
+
+```
+$ curl -i https://api.example.com/users/whatever
+
+HTTP/1.1 200 OK
+Date: Sun, 22 Mar 2015 12:32:06 GMT
+Status: 200 OK
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 3761
+X-RateLimit-Reset: 1372700873
+```
 
 ## Installation
 
@@ -17,13 +40,6 @@ And then execute:
 Or install it yourself as:
 
     $ gem install galago-rate_limiter
-
-## Configuration
-
-| Name | Description | Default |
-| ---- | ----------- | ------- |
-| limit | Number of requests allow per hour | 5,000 |
-| api_key_header | Header containing the consumers api key | 'X-Api-Key' |
 
 ## Usage
 
