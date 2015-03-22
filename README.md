@@ -70,8 +70,8 @@ end
 
 ### Rails
 The rate limiter uses a Railtie add itself to the middleware of your Rails
-application. If you want to override any of the defaults, all you have to do is
-add an initializer.
+application. You can override any of the defaults by adding an initializer and
+configuring the middleware using the options shown above.
 
 ### Rack
 ```ruby
@@ -79,13 +79,7 @@ add an initializer.
 require 'galago/rate_limiter'
 
 Galago::RateLimiter.configure do |config|
-  config.limit = 20_000
-  config.api_key_header = 'Some-Header'
-
-  config.counter = Dalli::Client.new('localhost:11211', {
-    namespace: 'galago-rate_limiter',
-    compress: true
-  })
+  # See example configuration above.
 end
 
 use Galago::RateLimiter
