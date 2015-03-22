@@ -43,18 +43,35 @@ Or install it yourself as:
 
 ## Usage
 
-### Rails
-The rate limiter uses a Railtie add itself to the middleware of your Rails
-application. All you have to do is add an initializer file to configure the
-settings.
-
+### Configuration
 ```ruby
-# config/initializers/galago_rate_limiter.rb
 Galago::RateLimiter.configure do |config|
+  # Number of requests a consumer is allowed to make per hour.
+  # Default: 5_000
   config.limit = 20_000
+
+  # The header containing the consumer's api key.
+  # Default: 'X-Api-Key'
   config.api_key_header = 'Some-Header'
+
+  # The object that will be used to increment the count of requests made by the consumer.
+  # Must be one of:
+  #   - Instance of Dalli::Client
+  #   - Instance of Redis
+  #   - Object that responds to `increment(key, amount, options = {})`
+  #
+  # Default: Rails.cache when used with Rails, otherwise must be provided.
+  config.counter = Dalli::Client.new('localhost:11211', {
+    namespace: 'galago-rate_limiter',
+    compress: true
+  })
 end
 ```
+
+### Rails
+The rate limiter uses a Railtie add itself to the middleware of your Rails
+application. If you want to override any of the defaults, all you have to do is
+add an initializer.
 
 ### Rack
 ```ruby
@@ -64,6 +81,11 @@ require 'galago/rate_limiter'
 Galago::RateLimiter.configure do |config|
   config.limit = 20_000
   config.api_key_header = 'Some-Header'
+
+  config.counter = Dalli::Client.new('localhost:11211', {
+    namespace: 'galago-rate_limiter',
+    compress: true
+  })
 end
 
 use Galago::RateLimiter
