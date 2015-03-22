@@ -22,6 +22,10 @@ module Galago
       @config.limit = 30_000
       assert_equal 30_000, @config.limit
     end
+
+    def test_setting_limit_to_zero
+      assert_raises(ArgumentError) { @config.limit = 0 }
+    end
   end
 end
 
