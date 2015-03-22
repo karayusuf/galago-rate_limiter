@@ -1,5 +1,4 @@
 require "json"
-require "dalli"
 require_relative "./rate_limiter/configuration"
 require_relative "./rate_limiter/memcached_counter"
 require_relative "./rate_limiter/redis_counter"

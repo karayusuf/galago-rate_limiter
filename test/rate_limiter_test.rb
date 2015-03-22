@@ -1,4 +1,5 @@
 require 'minitest/autorun'
+require 'dalli'
 require File.expand_path('../../lib/galago/rate_limiter.rb', __FILE__)
 
 module Galago
