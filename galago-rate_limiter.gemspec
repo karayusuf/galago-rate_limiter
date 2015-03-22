@@ -1,7 +1,7 @@
 # coding: utf-8
 Gem::Specification.new do |spec|
   spec.name          = "galago-rate_limiter"
-  spec.version       = "0.0.2"
+  spec.version       = "0.0.3"
   spec.authors       = ["Joe Karayusuf"]
   spec.email         = ["jkarayusuf@gmail.com"]
   spec.summary       = %q{GitHub style API Rate limiter}
