@@ -7,16 +7,17 @@ module Galago
       RateLimiter::Counter.instance.reset!
       @app = lambda { |env| [200, {}, ["Hello There"]] }
       @rate_limiter = RateLimiter.new(@app)
+      @rate_limiter_limit = RateLimiter::Configuration.instance.limit
     end
 
     def test_limit_header
       status, headers, body = @rate_limiter.call('X-Api-Key' => 'some-key')
-      assert_equal RateLimiter::LIMIT, headers['X-RateLimit-Limit']
+      assert_equal @rate_limiter_limit, headers['X-RateLimit-Limit']
     end
 
     def test_remaining_request_header
       status, headers, body = @rate_limiter.call('X-Api-Key' => 'some-key')
-      assert_equal RateLimiter::LIMIT - 1, headers['X-RateLimit-Remaining']
+      assert_equal @rate_limiter_limit - 1, headers['X-RateLimit-Remaining']
     end
 
     def test_reset_header
@@ -34,7 +35,7 @@ module Galago
     end
 
     def test_response_when_limit_has_been_reached
-      RateLimiter::LIMIT.times { @rate_limiter.call('X-Api-Key' => 'some-key') }
+      RateLimiter::Configuration.instance.limit.times { @rate_limiter.call('X-Api-Key' => 'some-key') }
       status, headers, body = @rate_limiter.call('X-Api-Key' => 'some-key')
       assert_equal 403, status
       assert_equal({ "message" => "API rate limit exceeded for some-key" }, JSON.parse(body))

@@ -1,46 +1,41 @@
 require "json"
 require "dalli"
+require_relative "./rate_limiter/configuration"
 require_relative "./rate_limiter/counter"
 
 module Galago
   class RateLimiter
-    # The maximum number of requests that the consumer is permitted to make per hour.
     X_LIMIT_HEADER = 'X-RateLimit-Limit'.freeze
-
-    # The time at which the current rate limit window resets in UTC epoch seconds.
     X_RESET_HEADER = 'X-RateLimit-Reset'.freeze
-
-    # The number of requests remaining in the current rate limit window.
     X_REMAINING_HEADER = 'X-RateLimit-Remaining'.freeze
 
-    # The header that contains the consumer's api key.
-    API_KEY_HEADER = 'X-Api-Key'.freeze
-
-    # The maximum number of requests that the consumer is permitted to make per hour.
-    LIMIT = 5000
+    def self.configure
+      yield Configuration.instance
+    end
 
     def initialize(app)
       @app = app
       @counter = RateLimiter::Counter.instance
+      @config = Configuration.instance
     end
 
     def call(env)
-      api_key = env[API_KEY_HEADER]
+      api_key = env[@config.api_key_header]
       throughput = @counter.increment(api_key, expires_in)
 
       if limit_exceeded?(throughput)
         status = 403
         headers = {
-          X_LIMIT_HEADER => LIMIT,
+          X_LIMIT_HEADER => @config.limit.to_s,
           X_REMAINING_HEADER => 0,
-          X_RESET_HEADER => limit_resets_at
+          X_RESET_HEADER => limit_resets_at.to_s
         }
         body = JSON(message: "API rate limit exceeded for #{api_key}")
       else
         status, headers, body = @app.call(env)
-        headers[X_LIMIT_HEADER] = LIMIT
-        headers[X_REMAINING_HEADER] = (LIMIT - throughput)
-        headers[X_RESET_HEADER] = limit_resets_at
+        headers[X_LIMIT_HEADER] = @config.limit.to_s
+        headers[X_REMAINING_HEADER] = (@config.limit - throughput).to_s
+        headers[X_RESET_HEADER] = limit_resets_at.to_s
       end
 
       [status, headers, body]
@@ -49,7 +44,7 @@ module Galago
     private
 
     def limit_exceeded?(throughput)
-      throughput > LIMIT
+      throughput > @config.limit
     end
 
     def timestamp

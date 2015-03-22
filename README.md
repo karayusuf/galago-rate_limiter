@@ -18,9 +18,34 @@ Or install it yourself as:
 
     $ gem install galago-rate_limiter
 
+## Configuration
 ## Usage
 
-TODO: Write usage instructions here
+### Rails
+The rate limiter uses a Railtie add itself to the middleware of your Rails
+application. All you have to do is add an initializer file to configure the
+settings.
+
+```ruby
+# config/initializers/galago_rate_limiter.rb
+Galago::RateLimiter.configure do |config|
+  config.limit = 20_000
+  config.api_key_header = 'Some-Header'
+end
+```
+
+### Rack
+```ruby
+require 'galago/rate_limiter'
+
+Galago::RateLimiter.configure do |config|
+  config.limit = 20_000
+  config.api_key_header = 'Some-Header'
+end
+
+use Galago::RateLimiter
+run lambda { |env| [200, {}, ['Hello There']] }
+```
 
 ## Contributing
 
