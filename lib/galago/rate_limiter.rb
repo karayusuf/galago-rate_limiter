@@ -22,6 +22,7 @@ module Galago
 
     def call(env)
       api_key = env[@config.api_key_header]
+      return @app.call(env) if api_key.nil?
       throughput = @counter.increment(api_key, 1, expires_in: expires_in)
 
       if limit_exceeded?(throughput)

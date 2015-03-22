@@ -35,6 +35,15 @@ module Galago
       assert_equal "#{start_of_next_hour}", headers['X-RateLimit-Reset']
     end
 
+    def test_response_when_no_api_key_is_provided
+      status, headers, body = @rate_limiter.call({})
+      assert_nil headers['X-RateLimit-Limit']
+      assert_nil headers['X-RateLimit-Remaining']
+      assert_nil headers['X-RateLimit-Reset']
+      assert_equal 200, status
+      assert_equal ["Hello There"], body
+    end
+
     def test_response_when_limit_has_not_been_reached
       status, headers, body = @rate_limiter.call('HTTP_X_API_KEY' => 'some-key')
       assert_equal 200, status
