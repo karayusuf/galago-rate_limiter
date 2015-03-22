@@ -2,6 +2,7 @@ require "json"
 require "dalli"
 require_relative "./rate_limiter/configuration"
 require_relative "./rate_limiter/memcached_counter"
+require_relative "./rate_limiter/redis_counter"
 require_relative "./rate_limiter/railtie" if defined?(Rails)
 
 module Galago

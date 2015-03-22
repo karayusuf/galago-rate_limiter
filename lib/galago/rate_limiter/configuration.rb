@@ -31,6 +31,7 @@ module Galago
       def counter=(counter)
         @counter = case counter
                    when Dalli::Client then MemcachedCounter.new(counter)
+                   when Redis then RedisCounter.new(counter)
                    else counter
                    end
       end
