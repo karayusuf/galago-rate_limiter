@@ -2,6 +2,7 @@ require "json"
 require "dalli"
 require_relative "./rate_limiter/configuration"
 require_relative "./rate_limiter/counter"
+require_relative "./rate_limiter/railtie" if defined?(Rails)
 
 module Galago
   class RateLimiter
@@ -15,13 +16,13 @@ module Galago
 
     def initialize(app)
       @app = app
-      @counter = RateLimiter::Counter.instance
+      @counter = Configuration.instance.counter
       @config = Configuration.instance
     end
 
     def call(env)
       api_key = env[@config.api_key_header]
-      throughput = @counter.increment(api_key, expires_in)
+      throughput = @counter.increment(api_key, 1, expires_in: expires_in)
 
       if limit_exceeded?(throughput)
         status = 403

@@ -16,8 +16,8 @@ module Galago
         @store.flush
       end
 
-      def increment(key, ttl)
-        @store.incr(key, 1, ttl, 1)
+      def increment(key, amount, options = {})
+        @store.incr(key, amount, options[:expires_in], 1)
       end
     end
   end

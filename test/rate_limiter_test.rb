@@ -38,7 +38,7 @@ module Galago
       RateLimiter::Configuration.instance.limit.times { @rate_limiter.call('HTTP_X_API_KEY' => 'some-key') }
       status, headers, body = @rate_limiter.call('HTTP_X_API_KEY' => 'some-key')
       assert_equal 403, status
-      assert_equal({ "message" => "API rate limit exceeded for some-key" }, JSON.parse(body))
+      assert_equal({ "message" => "API rate limit exceeded for some-key" }, JSON.parse(body.first))
     end
   end
 end

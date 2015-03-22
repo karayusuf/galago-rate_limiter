@@ -9,10 +9,12 @@ module Galago
       DEFAULT_API_KEY_HEADER = 'HTTP_X_API_KEY'.freeze
 
       attr_reader :api_key_header, :limit
+      attr_accessor :counter
 
       def initialize
         @limit = DEFAULT_LIMIT
         @api_key_header = DEFAULT_API_KEY_HEADER
+        @counter = Counter.instance
       end
 
       def limit=(limit)

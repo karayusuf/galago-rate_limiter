@@ -1,0 +1,8 @@
+source 'https://rubygems.org'
+
+# Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
+gem 'rails', '4.0.2'
+gem 'sqlite3'
+gem 'dalli'
+gem 'galago-rate_limiter', path: '/Users/jkarayusuf/checkouts/galago-rate_limiter'
+
