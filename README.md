@@ -41,9 +41,7 @@ Or install it yourself as:
 
     $ gem install galago-rate_limiter
 
-## Usage
-
-### Configuration
+## Configuration
 ```ruby
 Galago::RateLimiter.configure do |config|
   # Number of requests a consumer is allowed to make per hour.
@@ -68,6 +66,7 @@ Galago::RateLimiter.configure do |config|
 end
 ```
 
+## Usage
 ### Rails
 The rate limiter uses a Railtie add itself to the middleware of your Rails
 application. You can override any of the defaults by adding an initializer and
