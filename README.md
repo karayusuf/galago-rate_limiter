@@ -34,6 +34,8 @@ Status: 403 Forbidden
 X-RateLimit-Limit: 5000
 X-RateLimit-Remaining: 0
 X-RateLimit-Reset: 1427083200
+
+{"message":"API rate limit exceeded for Foo"}
 ```
 
 
