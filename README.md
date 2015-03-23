@@ -14,7 +14,7 @@ The middleware will add the following HTTP headers to any API request:
 
 #### Response when the limit has not been exceeded
 ```
-$ curl -i https://api.example.com/users/whatever
+$ curl -X GET https://api.example.com/users/whatever -H 'X-Api-Key: Foo' -i
 
 HTTP/1.1 200 OK
 Date: Sun, 22 Mar 2015 12:32:06 GMT
@@ -26,7 +26,7 @@ X-RateLimit-Reset: 1372700873
 
 #### Response for an exceeded limit
 ```
-$ curl -i https://api.example.com/users/whatever
+$ curl -X GET https://api.example.com/users/whatever -H 'X-Api-Key: Foo' -i
 
 HTTP/1.1 403 Forbidden
 Date: Sun, 22 Mar 2015 12:32:06 GMT
