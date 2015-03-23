@@ -1,6 +1,6 @@
 # Galago::RateLimiter
 
-Galago::RateLimiter is middleware that provides github style rate limiting to
+Galago::RateLimiter is a middleware that provides github style rate limiting to
 any Rack application. It has built in support for Rails and can be used by
 simply adding it to your gemfile.
 
@@ -12,8 +12,7 @@ The middleware will add the following HTTP headers to any API request:
 | X-RateLimit-Remaining | The number of requests remaining in the current rate limit window. |
 | X-RateLimit-Reset | The time at which the current rate limit window resets in UTC epoch seconds. |
 
-Example:
-
+#### Response when the limit has not been exceeded
 ```
 $ curl -i https://api.example.com/users/whatever
 
@@ -24,6 +23,19 @@ X-RateLimit-Limit: 5000
 X-RateLimit-Remaining: 3761
 X-RateLimit-Reset: 1372700873
 ```
+
+#### Response for an exceeded limit
+```
+$ curl -i https://api.example.com/users/whatever
+
+HTTP/1.1 403 Forbidden
+Date: Sun, 22 Mar 2015 12:32:06 GMT
+Status: 403 Forbidden
+X-RateLimit-Limit: 5000
+X-RateLimit-Remaining: 0
+X-RateLimit-Reset: 1427083200
+```
+
 
 ## Installation
 
@@ -69,8 +81,8 @@ end
 ## Usage
 ### Rails
 The rate limiter uses a Railtie add itself to the middleware of your Rails
-application. You can override any of the defaults by adding an initializer and
-configuring the middleware using the options shown above.
+application. You can override any of the defaults updating the config in an
+initializer.
 
 ### Rack
 ```ruby
