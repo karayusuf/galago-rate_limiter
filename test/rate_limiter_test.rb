@@ -1,61 +1,71 @@
 require 'minitest/autorun'
+require 'rack/test'
 require 'dalli'
+
 require File.expand_path('../../lib/galago/rate_limiter.rb', __FILE__)
 
 module Galago
   class RateLimiterTest < Minitest::Unit::TestCase
-    def setup
-      RateLimiter.configure do |config|
-        config.counter = Dalli::Client.new('localhost:11211', {
-          namespace: 'galago-rate_limiter',
-          compress: true
-        })
-        config.counter.reset!
-      end
+    include Rack::Test::Methods
 
-      @app = lambda { |env| [200, {}, ["Hello There"]] }
-      @rate_limiter = RateLimiter.new(@app)
-      @rate_limiter_limit = RateLimiter::Configuration.instance.limit
+    attr_reader :app
+    def setup
+      @app = Rack::Builder.new do
+        Galago::RateLimiter.configure do |config|
+          config.limit = 10
+          config.counter = Dalli::Client.new('localhost:11211')
+          config.counter.reset!
+        end
+
+        use Galago::RateLimiter
+        run lambda { |env| [200, {}, ["Hello There"]] }
+      end
+    end
+
+    def send_request(api_key)
+      get '/', {}, { 'HTTP_X_API_KEY' => api_key }
+      last_response
     end
 
     def test_limit_header
-      status, headers, body = @rate_limiter.call('HTTP_X_API_KEY' => 'some-key')
-      assert_equal "#{@rate_limiter_limit}", headers['X-RateLimit-Limit']
+      response = send_request('api-key')
+      assert_equal '10', response.headers['X-RateLimit-Limit']
     end
 
     def test_remaining_request_header
-      status, headers, body = @rate_limiter.call('HTTP_X_API_KEY' => 'some-key')
-      assert_equal "#{@rate_limiter_limit - 1}", headers['X-RateLimit-Remaining']
+      response = send_request('some-key')
+      assert_equal "#{10 - 1}", response.headers['X-RateLimit-Remaining']
     end
 
     def test_reset_header
       time = Time.now.utc.to_i
       start_of_next_hour = time - (time % 3600) + 3600
 
-      status, headers, body = @rate_limiter.call('HTTP_X_API_KEY' => 'some-key')
-      assert_equal "#{start_of_next_hour}", headers['X-RateLimit-Reset']
+      response = send_request('some-key')
+      assert_equal "#{start_of_next_hour}", response.headers['X-RateLimit-Reset']
     end
 
     def test_response_when_no_api_key_is_provided
-      status, headers, body = @rate_limiter.call({})
-      assert_nil headers['X-RateLimit-Limit']
-      assert_nil headers['X-RateLimit-Remaining']
-      assert_nil headers['X-RateLimit-Reset']
-      assert_equal 200, status
-      assert_equal ["Hello There"], body
+      response = send_request(nil)
+      assert_nil response.headers['X-RateLimit-Limit']
+      assert_nil response.headers['X-RateLimit-Remaining']
+      assert_nil response.headers['X-RateLimit-Reset']
+      assert_equal 200, response.status
+      assert_equal "Hello There", response.body
     end
 
     def test_response_when_limit_has_not_been_reached
-      status, headers, body = @rate_limiter.call('HTTP_X_API_KEY' => 'some-key')
-      assert_equal 200, status
-      assert_equal ["Hello There"], body
+      response = send_request('foo')
+      assert_equal 200, response.status
+      assert_equal "Hello There", response.body
     end
 
     def test_response_when_limit_has_been_reached
-      RateLimiter::Configuration.instance.limit.times { @rate_limiter.call('HTTP_X_API_KEY' => 'some-key') }
-      status, headers, body = @rate_limiter.call('HTTP_X_API_KEY' => 'some-key')
-      assert_equal 403, status
-      assert_equal({ "message" => "API rate limit exceeded for some-key" }, JSON.parse(body.first))
+      RateLimiter::Configuration.instance.limit.times { send_request('api-key') }
+
+      response = send_request('api-key')
+      assert_equal 403, response.status
+      assert_equal({ "message" => "API rate limit exceeded for api-key" }, JSON.parse(response.body))
     end
   end
 end
