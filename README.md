@@ -82,6 +82,16 @@ Galago::RateLimiter.configure do |config|
     namespace: 'galago-rate_limiter',
     compress: true
   })
+
+  # Callback that will be executed on every consumer request that exceeds the
+  # rate limit. The api_key of the current consumer will be yielded.
+  #
+  # Default: None
+  config.callback do |api_key|
+    # Execute your code here...
+    # Would be useful for determining how often a specific customer or all
+    # customers are hitting the limit.
+  end
 end
 ```
 

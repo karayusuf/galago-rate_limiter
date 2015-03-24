@@ -67,6 +67,23 @@ module Galago
       assert_equal 403, response.status
       assert_equal({ "message" => "API rate limit exceeded for api-key" }, JSON.parse(response.body))
     end
+
+    def test_callback_when_limit_has_been_reached
+      @exceeded_api_key = nil
+
+      Galago::RateLimiter.configure do |config|
+        config.limit = 1
+        config.callback { |api_key| @exceeded_api_key = api_key }
+      end
+
+      successful_response = send_request('api-key')
+      assert_equal 200, successful_response.status
+      assert_equal nil, @exceeded_api_key
+
+      limit_exceeded_response = send_request('api-key')
+      assert_equal 403, limit_exceeded_response.status
+      assert_equal 'api-key', @exceeded_api_key
+    end
   end
 end
 

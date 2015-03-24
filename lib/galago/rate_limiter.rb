@@ -26,6 +26,7 @@ module Galago
       throughput = @counter.increment(api_key, 1, expires_in: expires_in)
 
       if limit_exceeded?(throughput)
+        execute_callback(api_key)
         status = 403
         headers = {
           X_LIMIT_HEADER => @config.limit.to_s,
@@ -44,6 +45,10 @@ module Galago
     end
 
     private
+
+    def execute_callback(api_key)
+      @config.callback.call(api_key)
+    end
 
     def limit_exceeded?(throughput)
       throughput > @config.limit
