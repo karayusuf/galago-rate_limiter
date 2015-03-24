@@ -6,9 +6,16 @@ simply adding it to your gemfile.
 
 The middleware will add the following HTTP headers to any API request:
 
-- *X-RateLimit-Limit*: The maximum number of requests that the consumer is permitted to make per hour.
-- *X-RateLimit-Remaining*: The number of requests remaining in the current rate limit window.
-- *X-RateLimit-Reset*: The time at which the current rate limit window resets in UTC epoch seconds.
+<dl>
+  <dt>X-RateLimit-Limit</dt>
+  <dl>The maximum number of requests that the consumer is permitted to make per hour.</dl>
+
+  <dt>X-RateLimit-Remaining</dt>
+  <dl>The number of requests remaining in the current rate limit window.</dl>
+
+  <dt>X-RateLimit-Reset</dt>
+  <dl>The time at which the current rate limit window resets in UTC epoch seconds.</dl>
+</dl>
 
 #### Response when the limit has not been exceeded
 ```
